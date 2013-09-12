@@ -1,0 +1,37 @@
+#!/usr/bin/env python
+
+from sys import argv
+from pyfast import Cukier
+from getopt import getopt
+
+omega_listfile = "cukier_frequency.csv"
+delta_omega_file = "cukier_frequency_offset.csv"
+
+(opts, args) = getopt(argv[1:], "", ["omega=", "delta_omega="])
+
+for (opt, optarg) in opts:
+    while opt[0] == '-':
+        opt = opt[1:]
+
+    if opt == "omega":
+        omega_listfile = optarg
+    elif opt == "delta_omega":
+        delta_omega_file = optarg
+
+num_params = int(args[0])
+
+# Load data
+omega_0_list = open(omega_listfile, "r").read().split(",")
+delta_omega_0_list = [int(i) for i in open(delta_omega_file, "r")
+                      .read().split(",")]
+
+# Ensure omega 0 list is made of ints
+for i in xrange(0, len(omega_0_list)):
+    if not omega_0_list[i].isdigit():
+        omega_0_list[i] = 0
+    omega_0_list[i] = int(omega_0_list[i])
+
+# Generate List
+cukier = Cukier(omega_0_list, delta_omega_0_list)
+stuff = cukier.freq(int(num_params))
+print(",".join([str(i) for i in stuff]))
