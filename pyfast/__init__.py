@@ -17,3 +17,10 @@ class Cukier():
             return [o]
 
         return [o] + self.freq(m, i + 1, o)
+
+
+def get_fast_parameters(mins, maxs, omegas):
+    from pyfast.parameters import generate_samples
+    N = len(mins)
+    
+    return generate_samples(mins, maxs, omegas)

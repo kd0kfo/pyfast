@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+
+from sys import argv
+from getopt import getopt
+import numpy as np
+from pyfast import get_fast_parameters
+
+omega_filename = "omegas.csv"
+
+(opts, args) = getopt(argv[1:], "", ["omega="])
+
+for (opt, optarg) in opts:
+    while opt[0] == "-":
+        opt = opt[1:]
+
+    if opt == "omega":
+        omega_filename = optarg
+
+if len(args) < 1:
+    raise Exception("Missing output filename")
+outfilename = args[0]
+
+omegas = np.loadtxt(omega_filename, int, delimiter=",")
+Np = len(omegas)
+
+params = get_fast_parameters(np.ones(Np) * 0, np.ones(Np), omegas)
+
+np.savetxt(outfilename, params, delimiter=",")
