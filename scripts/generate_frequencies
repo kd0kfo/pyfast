@@ -4,19 +4,41 @@ from sys import argv
 from pyfast import Cukier
 from getopt import getopt
 
-omega_listfile = "cukier_frequency.csv"
-delta_omega_file = "cukier_frequency_offset.csv"
+DEFAULT_OMEGA_LISTFILE = "cukier_frequency.csv"
+DEFAULT_DELTA_OMEGA_LISTFILE = "cukier_frequency_offset.csv"
 
-(opts, args) = getopt(argv[1:], "", ["omega=", "delta_omega="])
 
+def print_usage():
+    print("Usage: generate_samples [-h] [--delta_omega FILE]"
+          " [--omega FILE] <output file name>")
+    print("Options:")
+    print("-h, --help\t\tUsage instructions")
+    print("    --delta_omega FILE\tFile containing frequency offsets."
+          " (Default: {0})".format(DEFAULT_DELTA_OMEGA_LISTFILE))
+    print("    --omega FILE\tFile initial containing frequencies"
+          " (Default: {0})".format(DEFAULT_OMEGA_LISTFILE))
+
+(opts, args) = getopt(argv[1:], "h", ["help", "delta_omega=", "omega="])
+
+omega_listfile = DEFAULT_OMEGA_LISTFILE 
+delta_omega_file = DEFAULT_DELTA_OMEGA_LISTFILE 
 for (opt, optarg) in opts:
     while opt[0] == '-':
         opt = opt[1:]
 
-    if opt == "omega":
-        omega_listfile = optarg
+    if opt in ["h", "help"]:
+        print_usage()
+        exit(0)
     elif opt == "delta_omega":
         delta_omega_file = optarg
+    elif opt == "omega":
+        omega_listfile = optarg
+
+if len(args) != 1:
+    from sys import stderr
+    stderr.write("Missing number of parameters\n")
+    stderr.write("For help, run generate_frequencies -h\n")
+    exit(1)
 
 num_params = int(args[0])
 

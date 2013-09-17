@@ -5,19 +5,36 @@ from getopt import getopt
 import numpy as np
 from pyfast import get_fast_parameters
 
-omega_filename = "omegas.csv"
+DEFAULT_OMEGA_FILENAME = "omegas.csv"
 
-(opts, args) = getopt(argv[1:], "", ["omega="])
 
+def print_usage():
+    print("Usage: generate_samples [-h] [--omega FILE] <output file name>")
+    print("Options:")
+    print("-h, --help\t\tUsage instructions")
+    print("    --omega FILE\tFile containing frequencies (Default: {0})"
+          .format(DEFAULT_OMEGA_FILENAME))
+
+
+(opts, args) = getopt(argv[1:], "h", ["help", "omega="])
+
+omega_filename = DEFAULT_OMEGA_FILENAME
 for (opt, optarg) in opts:
     while opt[0] == "-":
         opt = opt[1:]
 
-    if opt == "omega":
+    if opt in ["h", "help"]:
+        print_usage()
+        exit(0)
+    elif opt == "omega":
         omega_filename = optarg
 
 if len(args) < 1:
-    raise Exception("Missing output filename")
+    from sys import stderr
+    stderr.write("Missing output filename\n")
+    stderr.write("For help, run generate_samples -h\n")
+    exit(1)
+
 outfilename = args[0]
 
 omegas = np.loadtxt(omega_filename, int, delimiter=",")
