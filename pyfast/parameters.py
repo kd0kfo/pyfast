@@ -14,7 +14,6 @@ MIN_RUNS_CUKIER75 = [0, 0, 0, 19, 39, 71, 91, 167, 243, 315, 403,
                      7467, 12891, 13739, 14743, 15743, 16975, 18275,
                      18927, 19907, 20759, 21803]
 
-
 def generate_samples(mins, maxs, omegas, factor=1):
     import numpy as np
 
@@ -32,7 +31,7 @@ def generate_samples(mins, maxs, omegas, factor=1):
     s = np.arange(1, r + 1)
     #s = (np.pi / r) * ((2 * s) - r - 1) / 2
     s = (np.pi / r) * ((2 * s) - r - 1) / 2
-    
+
     # s = np.random.rand(min_runs)
 
     S = np.outer(s, omegas)

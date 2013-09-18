@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+
+from sys import argv, stdout
+from getopt import getopt
+from pyfast import fast
+from np import loadtxt
+
+def print_usage():
+    print("Usage: run_fast [-h] [-o OUTPUT] <model data>")
+    print("Options:")
+    print("-h, --help\t\tUsage instructions")
+    print("    --order INT\tNumber of Fourier Coefficients")
+    print("-o, --output FILE\tOutput file (Default: Standard Output)")
+
+(opts, args) = getopt(argv[1:], "ho:", ["help", "order=", "output="])
+
+order = 4 # Default
+outfile = stdout
+for (opt, optarg) in opts:
+    while opt[0] == '-':
+        opt = opt[1:]
+
+    if opt in ["h", "help"]:
+        print_usage()
+        exit(0)
+    elif opt == "order":
+        order = int(optarg)
+    elif opt in ["o", "output"]:
+        outfile = open(optarg, "w")
+
+if len(args) != 1:
+    from sys import stderr
+    stderr.write("Missing model data file\n")
+    stderr.write("For help, run run_fast -h\n")
+    exit(1)
+
+infilename = args[0]
+model = loadtxt(infilename, delimiter=",")
+
+fast(model, model.shape[1], order)
