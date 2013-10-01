@@ -10,7 +10,7 @@ def print_usage():
     print("Options:")
     print("-h, --help\t\tUsage instructions")
 
-(opts, args) = getopt(argv[1:], "h", ["help", "delta_omega=", "omega="])
+(opts, args) = getopt(argv[1:], "h", ["help"])
 
 for (opt, optarg) in opts:
     while opt[0] == '-':
@@ -19,10 +19,6 @@ for (opt, optarg) in opts:
     if opt in ["h", "help"]:
         print_usage()
         exit(0)
-    elif opt == "delta_omega":
-        delta_omega_file = optarg
-    elif opt == "omega":
-        omega_listfile = optarg
 
 if len(args) != 1:
     from sys import stderr
