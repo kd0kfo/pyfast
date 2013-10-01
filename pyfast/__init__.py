@@ -29,15 +29,17 @@ def freq(m, i=1, omega_0=0, omega_0_list=CUKIER_FREQUENCIES,
 
 def get_fast_parameters(mins, maxs, omegas):
     from pyfast.parameters import generate_samples
-    
+
     return generate_samples(mins, maxs, omegas)
 
 
 def double_series(x):
-    if not x:
+    from numpy import append
+    if len(x) == 0:
         return x
 
-    return x.reverse()[1:]
+    return append(x, x[-2::-1])
+
 
 def fast(model, num_params, M=4):
     from pyfast.parameters import MIN_RUNS_CUKIER75
@@ -47,8 +49,10 @@ def fast(model, num_params, M=4):
 
     # TODO: Add model dimension checks
 
-    FF = np.abs(np.fft(double_series(model))) / nsamples
-    FF = FF[:nsamples]
+    FF = np.abs(np.fft.fft(double_series(model))) / nsamples
+    FF = FF[0:nsamples + 1]
+    #FF = np.abs(np.fft.fft(model))/nsamples
+    num_freqs = len(FF)
 
     # Frequencies
     cukier = freq(num_params)
@@ -58,7 +62,12 @@ def fast(model, num_params, M=4):
     total = np.sum(FF[1:] ** 2)
     sensitivities = []
     for i in xrange(0, frequencies.shape[0]):
-        frequency_vals = FF[frequencies[i, :] + 1]
+        frequency_vals = []
+        for frequency in frequencies[i, :]:
+            if frequency + 1 >= num_freqs:
+                continue
+            frequency_vals.append(FF[frequency])
+        frequency_vals = np.array(frequency_vals)
         sensitivities.append(np.sum(frequency_vals ** 2) / total)
 
     return sensitivities

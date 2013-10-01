@@ -3,19 +3,19 @@
 from sys import argv, stdout
 from getopt import getopt
 from pyfast import fast
-from np import loadtxt
+from numpy import loadtxt, savetxt
 
 def print_usage():
-    print("Usage: run_fast [-h] [-o OUTPUT] <model data>")
+    print("Usage: run_fast [-h] [-o OUTPUT] <model data> <number of parameters>")
     print("Options:")
     print("-h, --help\t\tUsage instructions")
-    print("    --order INT\tNumber of Fourier Coefficients")
+    print("    --order INT\tNumber of Fourier Coefficients (Default: 4)")
     print("-o, --output FILE\tOutput file (Default: Standard Output)")
 
 (opts, args) = getopt(argv[1:], "ho:", ["help", "order=", "output="])
 
 order = 4 # Default
-outfile = stdout
+outfilename = None
 for (opt, optarg) in opts:
     while opt[0] == '-':
         opt = opt[1:]
@@ -26,15 +26,22 @@ for (opt, optarg) in opts:
     elif opt == "order":
         order = int(optarg)
     elif opt in ["o", "output"]:
-        outfile = open(optarg, "w")
+        outfilename = optarg
 
-if len(args) != 1:
+if len(args) != 2:
     from sys import stderr
-    stderr.write("Missing model data file\n")
+    stderr.write("Requires model data and number of parameters\n")
     stderr.write("For help, run run_fast -h\n")
     exit(1)
 
 infilename = args[0]
+num_params = int(args[1])
 model = loadtxt(infilename, delimiter=",")
 
-fast(model, model.shape[1], order)
+sensitivities = fast(model, num_params, order)
+
+if not outfilename:
+    print(sensitivities)
+else:
+    savetxt(outfilename, sensitivities, delimiter=",")
+
