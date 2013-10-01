@@ -6,19 +6,23 @@ import numpy as np
 from pyfast import get_fast_parameters
 
 DEFAULT_OMEGA_FILENAME = "omegas.csv"
+DEFAULT_NR = 1  # Default number of resamples, 1 = only sample once
 
 
 def print_usage():
-    print("Usage: generate_samples [-h] [--omega FILE] <output file name>")
+    print("Usage: generate_samples [-h] [--omega FILE] [--resamples Nr] <output file name>")
     print("Options:")
     print("-h, --help\t\tUsage instructions")
     print("    --omega FILE\tFile containing frequencies (Default: {0})"
           .format(DEFAULT_OMEGA_FILENAME))
+    print("    --resamples INT\tNumber of resamples (Default: {0}"
+          .format(DEFAULT_NR))
 
 
-(opts, args) = getopt(argv[1:], "h", ["help", "omega="])
+(opts, args) = getopt(argv[1:], "h", ["help", "omega=", "resamples="])
 
 omega_filename = DEFAULT_OMEGA_FILENAME
+Nr = DEFAULT_NR
 for (opt, optarg) in opts:
     while opt[0] == "-":
         opt = opt[1:]
@@ -28,6 +32,8 @@ for (opt, optarg) in opts:
         exit(0)
     elif opt == "omega":
         omega_filename = optarg
+    elif opt == "resamples":
+        Nr = int(optarg)
 
 if len(args) < 1:
     from sys import stderr
@@ -40,6 +46,6 @@ outfilename = args[0]
 omegas = np.loadtxt(omega_filename, int, delimiter=",")
 Np = len(omegas)
 
-params = get_fast_parameters(np.ones(Np) * 0, np.ones(Np), omegas)
+params = get_fast_parameters(np.ones(Np) * 0, np.ones(Np), omegas, Nr)
 
 np.savetxt(outfilename, params, delimiter=",")
