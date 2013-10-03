@@ -2,23 +2,32 @@
 
 from sys import argv
 from getopt import getopt
-from pyfast import freq
+from pyfast import freq, efast_freq, DEFAULT_M
 
 
 def print_usage():
-    print("Usage: generate_samples [-h] <Number of Parameters>")
+    print("Usage: generate_samples [-h] [-e] <Number of Parameters>")
     print("Options:")
+    print("-e, --extended\tGenerate Samples for Extended Fast (Default: off)")
+    print("-M, --harmonics INT\tNumber of harmonics to use (Default: {0})"
+          .format(DEFAULT_M))
     print("-h, --help\t\tUsage instructions")
 
-(opts, args) = getopt(argv[1:], "h", ["help"])
+(opts, args) = getopt(argv[1:], "ehM:", ["extended", "harmonics=", "help"])
 
+should_use_efast = False
+M = DEFAULT_M
 for (opt, optarg) in opts:
     while opt[0] == '-':
         opt = opt[1:]
 
-    if opt in ["h", "help"]:
+    if opt in ["e", "extended"]:
+        should_use_efast = True
+    elif opt in ["h", "help"]:
         print_usage()
         exit(0)
+    elif opt in ["m", "harmonics"]:
+        M = int(optarg)  
 
 if len(args) != 1:
     from sys import stderr
@@ -29,5 +38,10 @@ if len(args) != 1:
 num_params = int(args[0])
 
 # Generate List
-frequencies = freq(int(num_params))
-print(",".join([str(i) for i in frequencies]))
+if should_use_efast:
+    frequencies = efast_freq(num_params, M)
+    for l in frequencies:
+        print(",".join([str(i) for i in l]))
+else:
+    frequencies = freq(num_params)
+    print(",".join([str(i) for i in frequencies]))

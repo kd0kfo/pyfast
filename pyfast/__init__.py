@@ -29,6 +29,8 @@ CUKIER_FREQ_OFFSETS = [4, 8, 6, 10, 20, 22, 32, 40, 38, 26, 56, 62, 46,
                        170, 284, 568, 302, 438, 410, 248, 448, 388, 596, 217,
                        100, 488, 166]
 
+DEFAULT_M = 4
+
 
 def freq(m, i=1, omega_0=0, omega_0_list=CUKIER_FREQUENCIES,
          delta_omega_list=CUKIER_FREQ_OFFSETS):
@@ -58,7 +60,7 @@ def double_series(x):
     return append(x, x[-2::-1])
 
 
-def fast(model, num_params, M=4):
+def fast(model, num_params, M=DEFAULT_M):
     from pyfast.parameters import MIN_RUNS_CUKIER75
     import numpy as np
 
@@ -88,3 +90,32 @@ def fast(model, num_params, M=4):
         sensitivities.append(np.sum(frequency_vals ** 2) / total)
 
     return sensitivities
+
+
+def efast_freq(num_params, M=DEFAULT_M):
+    from pyfast.parameters import MIN_RUNS_CUKIER75
+    import numpy as np
+
+    omega = np.zeros(num_params)
+    nsamples = MIN_RUNS_CUKIER75[num_params]
+    omega[0] = np.floor((nsamples - 1) / (2 * M))
+    m = int(np.floor(omega[0] / (2 * M)))
+    if m >= num_params - 1:
+        omega[1:] = np.linspace(1, m, num_params - 1)
+    else:
+        omega[1:] = [(i % num_params) + 1 for i in xrange(0, num_params - 1)]
+
+    curr_omega = np.zeros(num_params)
+    frequencies = []
+    for i in xrange(0, num_params):
+        # Setup current omega values for i
+        for j in xrange(0, num_params):
+            if j == i:
+                curr_omega[j] = omega[0]
+            elif j > i:
+                curr_omega[j] = omega[1 + j - 1]
+            else:
+                curr_omega[j] = omega[1 + j]
+        frequencies.append(list(curr_omega))
+
+    return frequencies
