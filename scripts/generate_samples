@@ -10,13 +10,23 @@ DEFAULT_NR = 1  # Default number of resamples, 1 = only sample once
 
 
 def print_usage():
-    print("Usage: generate_samples [-h] [--omega FILE] [--resamples Nr] <output file name>")
+    print("Usage: generate_samples [-h] [--omega FILE] [--resamples Nr]"
+          " <output file name>")
     print("Options:")
     print("-h, --help\t\tUsage instructions")
     print("    --omega FILE\tFile containing frequencies (Default: {0})"
           .format(DEFAULT_OMEGA_FILENAME))
-    print("    --resamples INT\tNumber of resamples (Default: {0}"
+    print("    --resamples INT\tNumber of resamples (Default: {0})"
           .format(DEFAULT_NR))
+
+
+def do_fast(omegas, num_resamples, outputfilename):
+    Np = len(omegas)
+
+    params = get_fast_parameters(np.ones(Np) * 0, np.ones(Np),
+                                 omegas, num_resamples)
+
+    np.savetxt(outputfilename, params, delimiter=",")
 
 
 (opts, args) = getopt(argv[1:], "h", ["help", "omega=", "resamples="])
@@ -43,9 +53,15 @@ if len(args) < 1:
 
 outfilename = args[0]
 
-omegas = np.loadtxt(omega_filename, int, delimiter=",")
-Np = len(omegas)
+# For fast, we have an array
+# For efast, we have a matrix, with each row corresponding
+#  to varying a parameter.
 
-params = get_fast_parameters(np.ones(Np) * 0, np.ones(Np), omegas, Nr)
+omegas = np.loadtxt(omega_filename, float, delimiter=",")
+is_efast = (len(omegas.shape) == 2)
 
-np.savetxt(outfilename, params, delimiter=",")
+if is_efast:
+    for param in xrange(0, omegas.shape[0]):
+        do_fast(omegas[param], Nr, "{0}_{1}".format(param + 1, outfilename))
+else:
+    do_fast(omegas, Nr, outfilename)

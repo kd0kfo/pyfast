@@ -119,3 +119,5 @@ def efast_freq(num_params, M=DEFAULT_M):
         frequencies.append(list(curr_omega))
 
     return frequencies
+
+
