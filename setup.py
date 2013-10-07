@@ -2,7 +2,8 @@
 
 from setuptools import setup
 
-the_scripts = ['scripts/generate_frequencies','scripts/generate_samples']
+the_scripts = ['scripts/generate_frequencies','scripts/generate_samples',
+               'scripts/run_fast']
 
 setup(name='pyfast',
        version='0.1.0',
