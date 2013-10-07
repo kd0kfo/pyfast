@@ -13,6 +13,9 @@ Makes use of Equations from Cukier, R., Schaibly, J., Shuler, K.,
 Gained code inspiration from the R package, fast, which is released
  under GPL at http://cran.r-project.org/web/packages/fast/index.html
 
+Adapted code from SALib by "Jon Herman, Patrick Reed and others"
+ available under LGPL at https://github.com/jdherman/SALib
+
 """
 
 # Cukier et al 1975 Table VI, Omega_n column
@@ -121,3 +124,26 @@ def efast_freq(num_params, M=DEFAULT_M):
     return frequencies
 
 
+def efast_first_order(model, omega, M=DEFAULT_M):
+    import numpy as np
+    FF = np.fft.fft(model)
+    num_samples = len(model)
+    Lambdasqrd = np.power(np.absolute(FF[range(1, int(num_samples / 2))])
+                          / num_samples, 2)
+    V = 2 * np.sum(Lambdasqrd)
+    D1 = 2 * np.sum(Lambdasqrd[list(np.arange(1, M) * int(omega) - 1)])
+
+    return D1 / V
+
+
+def efast_total_order(model, omega, M=DEFAULT_M):
+    import numpy as np
+    FF = np.fft.fft(model)
+    num_samples = len(model)
+    Lambdasqrd = np.power(np.absolute(FF[range(1, int(num_samples / 2))])
+                          / num_samples, 2)
+    V = 2 * np.sum(Lambdasqrd)
+    Dt = 2 * sum(Lambdasqrd[range(int(omega / 2))])
+
+
+    return (1 - Dt / V)

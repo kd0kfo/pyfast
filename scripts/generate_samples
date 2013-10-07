@@ -10,29 +10,39 @@ DEFAULT_NR = 1  # Default number of resamples, 1 = only sample once
 
 
 def print_usage():
-    print("Usage: generate_samples [-h] [--omega FILE] [--resamples Nr]"
+    print("Usage: generate_samples [-h] [--mins FILE] [--maxs FILE]"
+          " [--omega FILE] [--resamples Nr]"
           " <output file name>")
     print("Options:")
     print("-h, --help\t\tUsage instructions")
+    print("    --mins FILE\t\tCSV list of minimum values for each parameter (Default: 0)")
+    print("    --maxs FILE\t\tCSV list of maximum values for each parameter (Default: 1)")
     print("    --omega FILE\tFile containing frequencies (Default: {0})"
           .format(DEFAULT_OMEGA_FILENAME))
     print("    --resamples INT\tNumber of resamples (Default: {0})"
           .format(DEFAULT_NR))
 
 
-def do_fast(omegas, num_resamples, outputfilename):
+def gen_samples(omegas, num_resamples, outputfilename, mins=None, maxs=None):
     Np = len(omegas)
 
-    params = get_fast_parameters(np.ones(Np) * 0, np.ones(Np),
-                                 omegas, num_resamples)
+    # TODO: Replace (or suppliment?) arrays with functions, in case parameters
+    # depend on each other.  
+    if mins is None:
+        mins = np.zeros(Np)
+    if maxs is None:
+        maxs = np.ones(Np)
+    params = get_fast_parameters(mins, maxs, omegas, num_resamples)
 
     np.savetxt(outputfilename, params, delimiter=",")
 
 
-(opts, args) = getopt(argv[1:], "h", ["help", "omega=", "resamples="])
+(opts, args) = getopt(argv[1:], "h", ["help", "maxs=", "mins=", "omega=", "resamples="])
 
 omega_filename = DEFAULT_OMEGA_FILENAME
 Nr = DEFAULT_NR
+mins = None
+maxs = None
 for (opt, optarg) in opts:
     while opt[0] == "-":
         opt = opt[1:]
@@ -40,6 +50,10 @@ for (opt, optarg) in opts:
     if opt in ["h", "help"]:
         print_usage()
         exit(0)
+    elif opt == "maxs":
+        maxs = np.loadtxt(optarg, delimiter=",")
+    elif opt == "mins":
+        mins = np.loadtxt(optarg, delimiter=",")
     elif opt == "omega":
         omega_filename = optarg
     elif opt == "resamples":
@@ -62,6 +76,7 @@ is_efast = (len(omegas.shape) == 2)
 
 if is_efast:
     for param in xrange(0, omegas.shape[0]):
-        do_fast(omegas[param], Nr, "{0}_{1}".format(param + 1, outfilename))
+        curr_filename = "{0}_{1}".format(param + 1, outfilename)
+        gen_samples(omegas[param], Nr, curr_filename, mins, maxs)
 else:
-    do_fast(omegas, Nr, outfilename)
+    gen_samples(omegas, Nr, outfilename)

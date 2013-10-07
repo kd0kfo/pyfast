@@ -1,26 +1,34 @@
 #!/usr/bin/env python
 
-from sys import argv, stdout
+from sys import argv
 from getopt import getopt
-from pyfast import fast
+from pyfast import fast, efast_first_order, efast_total_order, DEFAULT_M
 from numpy import loadtxt, savetxt
 
+
 def print_usage():
-    print("Usage: run_fast [-h] [-o OUTPUT] <model data> <number of parameters>")
+    print("Usage: run_fast [-e INT] [-h] [-o OUTPUT] <model data>"
+          " <number of parameters>")
     print("Options:")
+    print("-e NUMBER\t\tRun extended fast. NUMBER is the value of the"
+          " frequency for this parameter (Default: off)")
     print("-h, --help\t\tUsage instructions")
-    print("    --order INT\tNumber of Fourier Coefficients (Default: 4)")
+    print("    --order INT\t\tNumber of Fourier Coefficients (Default: {0})"
+          .format(DEFAULT_M))
     print("-o, --output FILE\tOutput file (Default: Standard Output)")
 
-(opts, args) = getopt(argv[1:], "ho:", ["help", "order=", "output="])
+(opts, args) = getopt(argv[1:], "e:ho:", ["help", "order=", "output="])
 
-order = 4 # Default
+order = DEFAULT_M
 outfilename = None
+omega = 0
 for (opt, optarg) in opts:
     while opt[0] == '-':
         opt = opt[1:]
 
-    if opt in ["h", "help"]:
+    if opt == "e":
+        omega = float(optarg)
+    elif opt in ["h", "help"]:
         print_usage()
         exit(0)
     elif opt == "order":
@@ -38,10 +46,14 @@ infilename = args[0]
 num_params = int(args[1])
 model = loadtxt(infilename, delimiter=",")
 
-sensitivities = fast(model, num_params, order)
+if omega:
+    first_order = efast_first_order(model, omega, order)
+    total_order = efast_total_order(model, omega, order)
+    sensitivities = [first_order, total_order]
+else:
+    sensitivities = fast(model, num_params, order)
 
 if not outfilename:
     print(sensitivities)
 else:
     savetxt(outfilename, sensitivities, delimiter=",")
-
