@@ -6,7 +6,7 @@ the_scripts = ['scripts/generate_frequencies','scripts/generate_samples',
                'scripts/run_fast']
 
 setup(name='pyfast',
-       version='0.1.0',
+       version='0.1.1',
        license='GPL v3',
        description='Utility functions for Sensitivity Analysis.',
        author='David Coss',
