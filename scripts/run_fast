@@ -6,7 +6,7 @@ run_fast
 
 Performs FAST or eFAST analyses on model data.
 
-For FAST, sensitivities are displayed as a vector.
+For FAST, sensitivities are displayed as a column vector.
 
 For eFAST, individual and total sensitivities are displayed as a pair.
 """
