@@ -1,9 +1,20 @@
 #!/usr/bin/env python
 
+"""
+run_fast
+========
+
+Performs FAST or eFAST analyses on model data.
+
+For FAST, sensitivities are displayed as a vector.
+
+For eFAST, individual and total sensitivities are displayed as a pair.
+"""
+
 from sys import argv
 from getopt import getopt
 from pyfast import fast, efast_first_order, efast_total_order, DEFAULT_M
-from numpy import loadtxt, savetxt
+from numpy import loadtxt, savetxt, array
 
 
 def print_usage():
@@ -49,7 +60,7 @@ model = loadtxt(infilename, delimiter=",")
 if omega:
     first_order = efast_first_order(model, omega, order)
     total_order = efast_total_order(model, omega, order)
-    sensitivities = [first_order, total_order]
+    sensitivities = array([first_order, total_order]).reshape((1,-1))
 else:
     sensitivities = fast(model, num_params, order)
 
