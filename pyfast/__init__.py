@@ -18,6 +18,10 @@ Adapted code from SALib by "Jon Herman, Patrick Reed and others"
 
 """
 
+import pkg_resources
+__version__ = pkg_resources.require("pyfast")[0].version
+
+
 # Cukier et al 1975 Table VI, Omega_n column
 CUKIER_FREQUENCIES = [0, 0, 1, 5, 11, 1, 17, 23, 19, 25, 41, 31, 23,
                       87, 67, 73, 58, 143, 149, 99, 119, 237, 267, 283,
