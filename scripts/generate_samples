@@ -79,4 +79,4 @@ if is_efast:
         curr_filename = "{0}_{1}".format(param + 1, outfilename)
         gen_samples(omegas[param], Nr, curr_filename, mins, maxs)
 else:
-    gen_samples(omegas, Nr, outfilename)
+    gen_samples(omegas, Nr, outfilename, mins, maxs)
