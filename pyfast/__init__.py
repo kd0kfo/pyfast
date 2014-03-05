@@ -8,13 +8,13 @@ License: GNU Public License version 3
 Package for Fourier Amplitude Sensitivity Testing
 
 Makes use of Equations from Cukier, R., Schaibly, J., Shuler, K.,
- J. Chem. Phys., 1975, 26: 1-42
+J. Chem. Phys., 1975, 26: 1-42
 
 Gained code inspiration from the R package, fast, which is released
- under GPL at http://cran.r-project.org/web/packages/fast/index.html
+under GPL at http://cran.r-project.org/web/packages/fast/index.html
 
 Adapted code from SALib by "Jon Herman, Patrick Reed and others"
- available under LGPL at https://github.com/jdherman/SALib
+available under LGPL at https://github.com/jdherman/SALib
 
 """
 
